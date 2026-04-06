@@ -93,6 +93,22 @@ async function startServer() {
     });
   });
 
+  app.get("/api/test-gemini", async (req, res) => {
+    if (!geminiKey) {
+      return res.status(400).json({ success: false, error: "GEMINI_API_KEY is missing from environment variables." });
+    }
+    try {
+      const testGenAI = new GoogleGenAI({ apiKey: geminiKey });
+      const response = await testGenAI.models.generateContent({
+        model: "gemini-3-flash-preview",
+        contents: "Please reply with exactly the word: OK",
+      });
+      res.json({ success: true, message: "Key is valid! Gemini responded successfully.", reply: response.text });
+    } catch (error: any) {
+      res.status(500).json({ success: false, error: error.message });
+    }
+  });
+
   // Vite middleware for development
   if (process.env.NODE_ENV !== "production") {
     const vite = await createViteServer({

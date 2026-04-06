@@ -33,6 +33,27 @@ export default function App() {
     return () => clearInterval(interval);
   }, []);
 
+  const [geminiTestResult, setGeminiTestResult] = useState<{ success: boolean; message: string } | null>(null);
+  const [testingGemini, setTestingGemini] = useState(false);
+
+  const testGeminiKey = async () => {
+    setTestingGemini(true);
+    setGeminiTestResult(null);
+    try {
+      const res = await fetch('/api/test-gemini');
+      const data = await res.json();
+      if (data.success) {
+        setGeminiTestResult({ success: true, message: data.message });
+      } else {
+        setGeminiTestResult({ success: false, message: data.error });
+      }
+    } catch (err: any) {
+      setGeminiTestResult({ success: false, message: "Failed to reach test endpoint." });
+    } finally {
+      setTestingGemini(false);
+    }
+  };
+
   return (
     <div className="min-h-screen bg-slate-50 font-sans text-slate-900 selection:bg-blue-100">
       <header className="bg-white border-b border-slate-200 px-6 py-4">
@@ -66,11 +87,22 @@ export default function App() {
               active={status?.hasToken ?? false} 
               description={status?.hasToken ? "Token is configured in environment." : "Missing TELEGRAM_BOT_TOKEN."}
             />
-            <StatusCard 
-              title="Gemini API" 
-              active={status?.geminiInitialized ?? false} 
-              description={status?.geminiInitialized ? "Gemini is ready to process messages." : "Missing GEMINI_API_KEY."}
-            />
+            <div className="relative">
+              <StatusCard 
+                title="Gemini API" 
+                active={status?.geminiInitialized ?? false} 
+                description={status?.geminiInitialized ? "Gemini is ready to process messages." : "Missing GEMINI_API_KEY."}
+              />
+              <div className="absolute bottom-4 right-4">
+                <button 
+                  onClick={testGeminiKey}
+                  disabled={testingGemini}
+                  className="text-xs bg-slate-100 hover:bg-slate-200 text-slate-700 px-3 py-1.5 rounded-lg font-medium transition-colors disabled:opacity-50"
+                >
+                  {testingGemini ? 'Testing...' : 'Verify Key'}
+                </button>
+              </div>
+            </div>
             <StatusCard 
               title="Connection Mode" 
               active={status?.isVercel ? true : (status?.isPolling ?? false)} 
@@ -82,6 +114,24 @@ export default function App() {
               description={status?.isVercel ? "Running on Vercel Edge." : "Backend is running on port 3000."}
             />
           </div>
+
+          {geminiTestResult && (
+            <div className={`mx-8 mb-8 p-4 border rounded-xl flex items-start gap-3 ${geminiTestResult.success ? 'bg-green-50 border-green-100' : 'bg-red-50 border-red-100'}`}>
+              {geminiTestResult.success ? (
+                <CheckCircle2 className="w-5 h-5 text-green-500 shrink-0 mt-0.5" />
+              ) : (
+                <XCircle className="w-5 h-5 text-red-500 shrink-0 mt-0.5" />
+              )}
+              <div>
+                <p className={`text-sm font-bold ${geminiTestResult.success ? 'text-green-800' : 'text-red-800'}`}>
+                  API Key Verification Result
+                </p>
+                <p className={`text-sm mt-1 ${geminiTestResult.success ? 'text-green-600' : 'text-red-600'}`}>
+                  {geminiTestResult.message}
+                </p>
+              </div>
+            </div>
+          )}
         </section>
 
         <section className="space-y-6">
