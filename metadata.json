@@ -1,0 +1,5 @@
+{
+  "name": "Gemini Telegram Bot",
+  "description": "A Telegram bot powered by Google Gemini that can chat, answer questions, and process images.",
+  "requestFramePermissions": []
+}
