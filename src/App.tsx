@@ -6,6 +6,7 @@ interface BotStatus {
   botInitialized: boolean;
   geminiInitialized: boolean;
   isPolling: boolean;
+  isVercel?: boolean;
   hasToken: boolean;
 }
 
@@ -44,7 +45,7 @@ export default function App() {
           </div>
           <div className="flex items-center gap-2 text-sm font-medium text-slate-500">
             <ShieldCheck className="w-4 h-4 text-green-500" />
-            <span>Secure Backend</span>
+            <span>{status?.isVercel ? 'Vercel Serverless' : 'Secure Backend'}</span>
           </div>
         </div>
       </header>
@@ -72,13 +73,13 @@ export default function App() {
             />
             <StatusCard 
               title="Connection Mode" 
-              active={status?.isPolling ?? false} 
-              description={status?.isPolling ? "Active (Polling Mode)" : "Disconnected"}
+              active={status?.isVercel ? true : (status?.isPolling ?? false)} 
+              description={status?.isVercel ? "Active (Vercel Webhook)" : (status?.isPolling ? "Active (Polling Mode)" : "Disconnected")}
             />
             <StatusCard 
               title="Server" 
               active={true} 
-              description="Backend is running on port 3000."
+              description={status?.isVercel ? "Running on Vercel Edge." : "Backend is running on port 3000."}
             />
           </div>
         </section>

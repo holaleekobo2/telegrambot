@@ -47,7 +47,7 @@ export default async function handler(req: any, res: any) {
     
   } catch (error: any) {
     console.error("Error processing message:", error.message);
-    await bot.sendMessage(chatId, "Oops! Something went wrong while processing your request.");
+    await bot.sendMessage(chatId, `❌ Gemini API Error: ${error.message}\n\n(Check if your GEMINI_API_KEY is correct)`);
   }
 
   // Always return 200 OK to Telegram so it doesn't retry the message

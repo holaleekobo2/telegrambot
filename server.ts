@@ -70,7 +70,7 @@ async function startServer() {
         console.log(`📤 Replied to ${chatId}`);
       } catch (error: any) {
         console.error("❌ Gemini Error:", error.message);
-        bot!.sendMessage(chatId, "Oops! Something went wrong while processing your request with Gemini.");
+        bot!.sendMessage(chatId, `❌ Gemini API Error: ${error.message}\n\n(Check if your GEMINI_API_KEY is correct)`);
       }
     });
   }
@@ -88,6 +88,7 @@ async function startServer() {
       botInitialized: !!bot,
       geminiInitialized: !!genAI,
       isPolling: bot ? bot.isPolling() : false,
+      isVercel: false,
       hasToken: !!token
     });
   });
