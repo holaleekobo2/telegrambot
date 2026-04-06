@@ -24,7 +24,10 @@ async function startServer() {
     res.status(400).json({ error: "Webhooks are disabled. Bot is using polling mode." });
   });
 
-  if (token) {
+  // We are disabling the local bot entirely so it doesn't steal messages from Vercel
+  const RUN_LOCAL_BOT = false;
+
+  if (token && RUN_LOCAL_BOT) {
     // Initialize temporarily to delete webhook
     bot = new TelegramBot(token, { polling: false });
     
